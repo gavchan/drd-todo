@@ -73,13 +73,17 @@ class App extends Component {
           {item.task}
         </span>
         <span>
-          <button 
+          { !item.completed ? <button
+            onClick={() => this.handleDone(item)}
+            className="btn btn-primary mr-2"> Done 
+            </button> : null }
+           <button 
             onClick={() => this.editItem(item)}
             className="btn btn-secondary mr-2"> Edit </button>
           <button 
             onClick={() => this.handleDelete(item)}
             className="btn btn-danger"> Delete </button>
-        </span>
+       </span>
       </li>
     ));
   };
@@ -100,6 +104,12 @@ class App extends Component {
       .then(res => this.refreshList());
   };
 
+  handleDone = item => {
+    item.completed = true;
+    axios
+      .put(`http://localhost:8000/api/todos/${item.id}/`, item)
+      .then(res => this.refreshList());
+  }
   handleDelete = item => {
     axios
       .delete(`http://localhost:8000/api/todos/${item.id}`)
