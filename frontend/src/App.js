@@ -1,70 +1,32 @@
 import React, { Component } from 'react';
 import Modal from "./components/Modal";
-
-// Generate several default todoItems
-const todoItems = [
-  {
-    "id": 1,
-    "task": "Buy groceries",
-    "description": "Eggs, ham, vegetables",
-    "completed": true,
-    "created_at": "06/02/2020 09:30:24",
-    "completed_at": "08/02/2020 09:30:24"
-  },
-  {
-    "id": 2,
-    "task": "Wash car",
-    "description": "Make sure to clean inside",
-    "completed": false,
-    "created_at": "07/02/2020 19:30:24",
-    "completed_at": null
-  },
-  {
-    "id": 3,
-    "task": "Prepare presentation",
-    "description": "Conference in in March",
-    "completed": false,
-    "created_at": "08/02/2020 10:01:01",
-    "completed_at": null
-  }
-];
+import axios from 'axios';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      modal: false,
       viewCompleted: false,
       activeItem: {
         task: "",
         description: "",
-        completed: false
+        completed: false,
+        created_at: null,
+        completed_at: null
       },
-      todoList: todoItems
+      todoList: []
     };
   }
-
-  toggle = () => {
-    this.setState({ modal: !this.state.modal });
+  componentDidMount() {
+    this.refreshList();
+  }
+  refreshList = () => {
+    axios
+      .get("http://localhost:8000/api/todos/")
+      .then(res => this.setState({ todoList: res.data }))
+      .catch(err => console.log(err))
   };
-
-  handleSubmit = item => {
-    this.toggle();
-    alert("save" + JSON.stringify(item));
-  }
-
-  handleDelete = item => {
-    alert("delete" + JSON.stringify(item));
-  }
-
-  createItem = () => {
-    const item = { task: "", description: "", completed: false };
-    this.setState({ activeItem: item, modal: !this.state.modal });
-  }
-
-  editItem = item => {
-    this.setState({ activeItem: item, modal: !this.state.modal });
-  }
+  
 
   displayCompleted = status => {
     if (status) {
@@ -121,6 +83,38 @@ class App extends Component {
       </li>
     ));
   };
+  toggle = () => {
+    this.setState({ modal: !this.state.modal });
+  };
+
+  handleSubmit = item => {
+    this.toggle();
+    if (item.id) {
+      axios
+        .put(`http://localhost:8000/api/todos/${item.id}/`, item)
+        .then(res => this.refreshList());
+      return;
+    }
+    axios
+      .post("http://localhost:8000/api/todos/", item)
+      .then(res => this.refreshList());
+  };
+
+  handleDelete = item => {
+    axios
+      .delete(`http://localhost:8000/api/todos/${item.id}`)
+      .then(res => this.refreshList());
+  };
+
+  createItem = () => {
+    const item = { task: "", description: "", completed: false };
+    this.setState({ activeItem: item, modal: !this.state.modal });
+  };
+
+  editItem = item => {
+    this.setState({ activeItem: item, modal: !this.state.modal });
+  };
+
   render() {
     return (
       <main className="content">
@@ -148,7 +142,7 @@ class App extends Component {
           />
         ) : null}
       </main>
-    )
+    );
   }
 }
 export default App;
