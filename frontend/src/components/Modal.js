@@ -17,7 +17,7 @@ export default class CustomModal extends Component {
         this.state = {
             activeItem: this.props.activeItem
         };
-    }
+    };
 
     handleChange = e => {
         const wasCompleted = this.state.activeItem.completed;
@@ -29,16 +29,15 @@ export default class CustomModal extends Component {
                 // If checked as completed when not previously, to update datetime
                 let t = new Date();
                 activeCompleted_at = t.toISOString();
-                console.log("Completed at " + activeCompleted_at)
             }
         }
         const activeItem = { ...this.state.activeItem, 
             [name]: value,
             completed_at: activeCompleted_at
         };
-        console.log(activeItem);
         this.setState({ activeItem });
     };
+    
     render() {
         const { toggle, onSave } = this.props;
         return (
