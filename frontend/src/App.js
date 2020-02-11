@@ -106,6 +106,8 @@ class App extends Component {
 
   handleDone = item => {
     item.completed = true;
+    let t = new Date();
+    item.completed_at = t.toISOString();
     axios
       .put(`http://localhost:8000/api/todos/${item.id}/`, item)
       .then(res => this.refreshList());

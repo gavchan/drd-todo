@@ -20,11 +20,23 @@ export default class CustomModal extends Component {
     }
 
     handleChange = e => {
+        const wasCompleted = this.state.activeItem.completed;
+        let activeCompleted_at = null;
         let { name, value } = e.target;
         if (e.target.type === "checkbox") {
             value = e.target.checked;
+            if (value && !wasCompleted) {
+                // If checked as completed when not previously, to update datetime
+                let t = new Date();
+                activeCompleted_at = t.toISOString();
+                console.log("Completed at " + activeCompleted_at)
+            }
         }
-        const activeItem = { ...this.state.activeItem, [name]: value };
+        const activeItem = { ...this.state.activeItem, 
+            [name]: value,
+            completed_at: activeCompleted_at
+        };
+        console.log(activeItem);
         this.setState({ activeItem });
     };
     render() {
@@ -62,7 +74,8 @@ export default class CustomModal extends Component {
                                 checked={this.state.activeItem.completed}
                                 onChange={this.handleChange}
                               />
-                              Completed
+                              Completed 
+                              { this.state.activeItem.completed ? ' at ' + this.state.activeItem.completed_at : null}
                             </Label>
                         </FormGroup>
                     </Form>
